@@ -7,7 +7,7 @@ echo  SNORLAX x MUNCHLAX - PSA MARKET ATLAS (NEXT.JS APP)
 echo ====================================================
 where node >nul 2>nul
 if errorlevel 1 (
-  echo CHUA CO NODE.JS. Cai Node.js 18+ tu https://nodejs.org/
+  echo CHUA CO NODE.JS. Cai Node.js 22.13+ tu https://nodejs.org/
   pause
   exit /b 1
 )

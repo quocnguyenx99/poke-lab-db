@@ -2,16 +2,16 @@
 
 Web app Next.js tra cứu **535 thẻ Pokémon Snorlax & Munchlax đã chấm điểm PSA**: giá Buy It Now trên eBay / Fanatics Collect, giá tham chiếu PriceCharting, xếp hạng tiềm năng S → F, PSA population, chế độ danh mục P/P < 400 triệu VNĐ.
 
-Repo này đồng thời là **bài thực hành Database với Agent**:
+Repo này đồng thời là **bài thực hành Database với Agent** (2 tiếng). Đọc trước: [docs/labs/README.md](docs/labs/README.md) (lịch học, chuẩn bị, xử lý sự cố).
 
 | Lab | Nội dung | Tài liệu |
 |---|---|---|
 | Lab 1 | SQL · ERD · Use case · Google Sheets + Apps Script (clasp) | [docs/labs/lab1-sql-sheets](docs/labs/lab1-sql-sheets/README.md) |
-| Lab 2 | NoSQL · Firestore · Firebase Auth · Shop demo · Firebase Hosting | _(sắp cập nhật)_ |
+| Lab 2 | NoSQL · Firestore · Firebase Auth · Shop demo · Firebase Hosting | [docs/labs/lab2-firebase-nosql](docs/labs/lab2-firebase-nosql/README.md) |
 
 ## Chạy app
 
-Cần Node.js 22+.
+Cần Node.js 22.13+ (kiểm tra: `node -v`).
 
 ```bash
 npm install

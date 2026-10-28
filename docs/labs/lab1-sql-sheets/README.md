@@ -1,138 +1,120 @@
-# Lab 1 — SQL, ERD, Use Case với Google Sheets + Apps Script (Agent điều khiển)
+# Lab 1 — SQL · ERD · Google Sheets + Apps Script (50 phút)
 
-**Thời lượng**: ~90 phút · **Yêu cầu**: Node.js 22+, tài khoản Google, một AI coding Agent (Claude Code…)
-
-## Mục tiêu
-1. Đọc dữ liệu thật và nhận ra vì sao một bảng phẳng gây ra **dư thừa và bất thường khi cập nhật**.
-2. Chuẩn hóa thành **ERD 3NF**, viết **DDL** và các câu **SQL** (JOIN, GROUP BY, HAVING, VIEW, subquery).
-3. Vẽ **Use case** và ánh xạ từng use case sang bảng/câu lệnh.
-4. Dùng **Google Sheets làm kho dữ liệu** và **Apps Script làm REST API**. Agent viết code, `clasp push`, `clasp deploy`.
-5. Cho web app Next.js đọc dữ liệu từ Sheets thay vì file JSON.
-6. Biết **nghiệm thu** kết quả của Agent bằng con số kiểm chứng được.
-
-## Bắt đầu
+**Kết quả cuối**: dữ liệu thẻ được tách thành 6 bảng quan hệ, truy vấn bằng SQL thật (SQLite), lưu trên Google Sheets và mở thành REST API bằng Apps Script. Toàn bộ code do Agent viết và deploy qua `clasp`.
 
 ```bash
-git clone <repo> && cd pokemon-tcg
-git checkout -b lab1-<ten-ban>              # làm bài trên branch riêng
-npm install
-npm run dev                                  # http://localhost:4173 — app đang đọc data/catalog/catalog.json
+git checkout -b lab1          # làm bài trên branch riêng
+git fetch origin lab1-solution  # tải lời giải để dùng "Đường tắt" khi kẹt
 ```
 
-> Mỗi bước dưới đây có: **Prompt** (dán cho Agent), **Kết quả mong đợi**, **Tự kiểm tra**. Đừng chấp nhận kết quả của Agent nếu chưa tự kiểm tra.
-> Bị kẹt? Lời giải tham khảo ở branch `lab1-solution` (`git diff main lab1-solution` để xem toàn bộ thay đổi).
+| Bước | Thời gian | Nội dung |
+|---|---|---|
+| 1 | 10' | Khảo sát dữ liệu → ERD → Use case |
+| 2 | 15' | Chuẩn hóa dữ liệu + SQL thật với SQLite |
+| 3 | 15' | Google Sheet + Apps Script API qua clasp |
+| 4 | 10' | Nạp dữ liệu lên Sheet, gọi API, `QUERY()` |
 
 ---
 
-## Bước 1 — Khảo sát dữ liệu (10')
+## Bước 1 — Khảo sát dữ liệu, ERD, Use case (10')
 
 **Prompt**
-> Đọc `data/catalog/catalog.json` và `types/card.ts`. Thống kê: số phần tử, số giá trị khác nhau của `set`, `seller`, `character`. Seller nào lặp lại nhiều nhất và bao nhiêu lần? Có field nào tính được từ field khác không? Trình bày dạng bảng, chưa viết code vào repo.
+> Đọc `data/catalog/catalog.json` và `types/card.ts`. (1) Thống kê số phần tử, số giá trị khác nhau của `set`, `seller`, `character`; seller nào lặp nhiều nhất. (2) Chỉ ra field nào tính được từ field khác. (3) Kiểm tra trên dữ liệu: `year` phụ thuộc vào `set` hay vào từng thẻ? (4) Đề xuất lược đồ 3NF và vẽ Mermaid `erDiagram` vào `docs/labs/lab1-sql-sheets/erd.md`, kèm phần mở rộng cho web bán thẻ: users, favorites, orders, order_items. (5) Vẽ sơ đồ use case (Mermaid flowchart, actor Khách / Thành viên / Quản trị viên) vào `docs/labs/lab1-sql-sheets/usecase.md`.
 
-**Kết quả mong đợi**: 535 listing, 44 set, 37 seller. "Official PSA Store" lặp 338 lần. `tier` tính được từ `tierScore`, `diffPercent` tính được từ giá niêm yết và giá PriceCharting.
+**Kết quả mong đợi**
+- 535 listing, 44 set, 37 seller. "Official PSA Store" lặp **338 lần**.
+- `tier` tính từ `tierScore`; `diffPercent`, `dealRating` tính từ giá. Những field này **không nên lưu**.
+- Set "Jungle" có nhiều năm (1996 bản Nhật, 1999 bản Mỹ…), nên `year` thuộc bảng `cards`.
+- 6 bảng: `sets`, `cards`, `sellers`, `listings`, `price_references` (khóa ghép thẻ + grade), `pop_reports`.
 
-**Thảo luận**: nếu "Official PSA Store" đổi số feedback thì phải sửa bao nhiêu dòng? Đó là *update anomaly*.
+**Giảng**: seller đổi số feedback thì phải sửa 338 dòng (*update anomaly*). Đó là lý do cần chuẩn hóa.
 
-## Bước 2 — Thiết kế ERD (15')
+**Tự kiểm tra**: mở `erd.md` bằng Markdown Preview của VS Code/GitHub, thấy sơ đồ hiển thị.
 
-**Prompt**
-> Đề xuất lược đồ quan hệ đạt 3NF cho dữ liệu này. Với mỗi bảng: khóa chính, khóa ngoại, và lý do tách (phụ thuộc hàm nào). Kiểm tra trên dữ liệu thật xem `year` phụ thuộc vào `set` hay vào thẻ. Vẽ bằng Mermaid `erDiagram` vào `docs/labs/lab1-sql-sheets/erd.md`. Thêm phần mở rộng cho website bán thẻ: users, favorites, orders, order_items.
+**Đường tắt**: `git checkout origin/lab1-solution -- docs/labs/lab1-sql-sheets/erd.md docs/labs/lab1-sql-sheets/usecase.md`
 
-**Tự kiểm tra**: mở `erd.md` trên GitHub/VS Code (Mermaid preview). Tự hỏi: mỗi cột không phải khóa có phụ thuộc vào *toàn bộ* khóa và *chỉ* khóa không?
-Gợi ý: set "Jungle" có nhiều năm, nên `year` thuộc về `cards`.
+---
 
-## Bước 3 — Use case (10')
-
-**Prompt**
-> Vẽ sơ đồ use case (Mermaid flowchart) cho website tra cứu & bán thẻ: actor Khách, Thành viên, Quản trị viên. Kèm bảng ánh xạ use case → bảng đọc/ghi. Lưu vào `docs/labs/lab1-sql-sheets/usecase.md`.
-
-## Bước 4 — Chuẩn hóa dữ liệu + SQL thật với SQLite (20')
+## Bước 2 — Chuẩn hóa + SQL thật với SQLite (15')
 
 **Prompt**
-> Viết `scripts/labs/export-normalized.mjs` (Node thuần, không thêm thư viện) chuyển catalog thành các bảng theo ERD, ghi `data/normalized/<bảng>.csv` và `.json`. Id thẻ phải ổn định giữa các lần chạy. Nếu cùng một (thẻ, grade) có 2 giá PriceCharting khác nhau thì KHÔNG tự chọn mà ghi vào `data/normalized/_conflicts.csv`.
-> Sau đó viết `docs/labs/lab1-sql-sheets/schema.sql` (có PRIMARY KEY, FOREIGN KEY, CHECK, INDEX và VIEW `v_listing_deals` tính tier/% chênh lệch), `queries.sql` (ít nhất 8 câu dùng JOIN, GROUP BY, HAVING, subquery), và `scripts/labs/sqlite-demo.mjs` dùng `node:sqlite` để nạp dữ liệu rồi chạy toàn bộ query.
+> Theo ERD trong `erd.md`:
+> 1. Viết `scripts/labs/export-normalized.mjs` (Node thuần, không cài thư viện): đọc catalog, ghi `data/normalized/<bảng>.json` và `.csv`. Id thẻ phải ổn định giữa các lần chạy (hash của character+set+year+variant+name). Nếu cùng (thẻ, grade) có 2 giá PriceCharting khác nhau thì KHÔNG tự chọn, ghi vào `data/normalized/_conflicts.csv`.
+> 2. Viết `docs/labs/lab1-sql-sheets/schema.sql` (SQLite): PRIMARY KEY, FOREIGN KEY, CHECK, INDEX, và VIEW `v_listing_deals` tính tier + % chênh lệch so với PriceCharting.
+> 3. Viết `docs/labs/lab1-sql-sheets/queries.sql`: mỗi câu mở đầu bằng dòng `-- Qn: <mô tả>`, gồm WHERE/ORDER BY, JOIN + GROUP BY + HAVING, dùng VIEW, subquery, và Q10 tìm listing có giá < 5% giá PriceCharting.
+> 4. Viết `scripts/labs/sqlite-demo.mjs` dùng `node:sqlite` nạp schema + dữ liệu rồi in kết quả từng query bằng `console.table`.
+> Chạy cả hai script và báo số dòng từng bảng.
 
 ```bash
 node scripts/labs/export-normalized.mjs
-node scripts/labs/sqlite-demo.mjs                        # chạy trong RAM
-node scripts/labs/sqlite-demo.mjs data/normalized/atlas.db   # lưu file, mở bằng DB Browser for SQLite / DBeaver
+node scripts/labs/sqlite-demo.mjs
 ```
 
-**Kết quả mong đợi**: `listings 535`, `cards 253`, `sets 44`, `sellers 37`, `_conflicts 11`.
+**Kết quả mong đợi**: `sets 44`, `cards 253`, `sellers 37`, `listings 535`, `price_references 269`, `pop_reports 148`, `_conflicts 11`.
 
 **Tự kiểm tra**
-- Q1 trong `queries.sql` đếm đúng 535 listing.
-- Thử `INSERT` một listing có `card_id` không tồn tại. SQLite phải báo lỗi `FOREIGN KEY constraint failed`.
-- Query Q10 (giá < 5% PriceCharting) trả về 13 listing giá $1.01. **Đây là lỗi dữ liệu thật trong app** (app đang gắn nhãn "SIÊU HỜI"). Thảo luận: Agent có nên tự sửa giá không? (Không. Phải xác minh trên sàn trước.)
+- Q1 đếm đúng 535 listing.
+- Q10 trả về **13 listing giá $1.01**. Đây là **lỗi dữ liệu thật**: app đang gắn nhãn "SIÊU HỜI −99%" cho chúng. Hỏi lớp: Agent có nên tự sửa giá không? (Không. Phải xác minh trên sàn trước.)
+- `_conflicts.csv` có 11 dòng: cùng một thẻ cùng grade nhưng có 2 giá tham chiếu. Chuẩn hóa đã **làm lộ** dữ liệu không nhất quán.
 
-## Bước 5 — Google Sheets + Apps Script qua clasp (25')
+**Đường tắt**: `git checkout origin/lab1-solution -- scripts/labs docs/labs/lab1-sql-sheets`
 
-### 5.1 Việc bạn tự làm (Agent không đăng nhập thay bạn được)
-1. Bật Apps Script API: <https://script.google.com/home/usersettings> → **On**.
-2. Đăng nhập clasp: `npx @google/clasp login` (mở trình duyệt, chọn tài khoản Google).
+---
 
-### 5.2 Giao cho Agent
+## Bước 3 — Google Sheet + Apps Script API qua clasp (15')
 
-**Prompt**
-> Trong thư mục `apps-script/`, viết Apps Script (V8) cho một Google Sheet đóng vai database:
-> - `Schema.js`: định nghĩa các tab = bảng theo ERD (kể cả users, favorites, orders, order_items) và khóa chính.
-> - `Setup.js`: `setupSheets()` tạo tab + header, sinh `API_TOKEN` lưu trong Script Properties, tạo tab `reports` dùng hàm `QUERY()`.
-> - `Api.js`: Web App `doGet` (`?table=` có lọc theo cột, `?view=catalog` ghép các bảng như một VIEW) và `doPost` (`import` hàng loạt, `insert`/`delete` cho bảng người dùng, bắt buộc token, dùng `LockService`, tự kiểm tra trùng khóa chính).
-> Sau đó dùng clasp: tạo project gắn với một Google Sheet mới tên "Pokemon Atlas DB", push code, và hướng dẫn tôi chạy `setupSheets` một lần.
-
-Lệnh Agent sẽ chạy (tham khảo):
-```bash
-cd apps-script
-npx @google/clasp create --type sheets --title "Pokemon Atlas DB" --rootDir .
-git checkout -- appsscript.json      # clasp create có thể ghi đè manifest — khôi phục bản của repo
-npx @google/clasp push
-npx @google/clasp open-container     # mở Sheet
-```
-
-### 5.3 Chạy `setupSheets` (bạn tự bấm, lần đầu Google sẽ hỏi cấp quyền)
-Trong Sheet: **Tiện ích mở rộng → Apps Script** → chọn hàm `setupSheets` → **Chạy** → cấp quyền → mở **Nhật ký thực thi**, copy `API_TOKEN`.
-
-### 5.4 Deploy Web App và nạp dữ liệu
+Yêu cầu: đã bật Apps Script API và đã `clasp login` (xem [chuẩn bị](../README.md#chuẩn-bị-trước-buổi-học)).
 
 **Prompt**
-> Deploy Apps Script thành Web App (`npx @google/clasp deploy`), lấy URL `/exec`. Ghi `SHEETS_API_URL` và `SHEETS_API_TOKEN` vào `.env.local`. Viết `scripts/labs/push-to-sheets.mjs` nạp `data/normalized/*.json` lên Sheets theo lô 200 dòng, rồi gọi `GET ?table=listings` để xác nhận số dòng.
+> Tạo database trên Google Sheets điều khiển bằng Apps Script, dùng clasp 3.4.1:
+> 1. Tạo thư mục `apps-script/`, trong đó chạy `npx @google/clasp@3.4.1 create --type sheets --title "Poke Lab DB" --rootDir .` **trước khi viết code** (lệnh này ghi đè `appsscript.json`).
+> 2. Sửa `appsscript.json`: runtime V8, timeZone Asia/Ho_Chi_Minh, `webapp` với `executeAs: USER_DEPLOYING`, `access: ANYONE_ANONYMOUS`.
+> 3. `Schema.js`: object `TABLES` = tên tab → danh sách cột, đúng ERD (cả users, favorites, orders, order_items), và khóa chính từng bảng.
+> 4. `Setup.js`: hàm `setupSheets()` tạo tab + header in đậm, sinh `API_TOKEN` (UUID) lưu vào Script Properties rồi `Logger.log` ra, và tạo tab `reports` dùng hàm `QUERY()`.
+> 5. `Api.js`: `doGet` hỗ trợ `?table=<tên>` có lọc theo cột (vd `&grade=10`) và `?view=catalog` (ghép các bảng như VIEW); `doPost` nhận JSON `{token, action, table, ...}` với `action` = `import` (ghi hàng loạt, có `replace`), `insert`/`delete` (chỉ cho bảng người dùng). Bắt buộc đúng token, dùng `LockService`, tự kiểm tra trùng khóa chính. Lỗi trả `{ok:false, error}`.
+> 6. Thêm `.claspignore` chỉ đẩy `*.js` và `appsscript.json`, rồi chạy `npx @google/clasp@3.4.1 push`.
+
+**Bạn tự làm** (cần bấm cấp quyền, Agent không làm thay được):
+1. `cd apps-script && npx @google/clasp@3.4.1 open-container` để mở Sheet.
+2. **Tiện ích mở rộng → Apps Script** → chọn hàm `setupSheets` → **Chạy** → cấp quyền (*Nâng cao → Đi tới… (không an toàn)* là bình thường với script của chính mình).
+3. Mở **Nhật ký thực thi** và copy `API_TOKEN`.
+
+**Prompt (deploy)**
+> Chạy `npx @google/clasp@3.4.1 deploy -d "v1"` trong `apps-script/`, lấy deploymentId và tạo URL `https://script.google.com/macros/s/<deploymentId>/exec`. Ghi vào `.env.local`: `SHEETS_API_URL=<URL>` và `SHEETS_API_TOKEN=<token tôi dán>`.
+
+**Tự kiểm tra**: mở `<URL>?table=sets` trên trình duyệt, thấy `{"ok":true,"count":0,"rows":[]}`. Sheet có 10 tab bảng + tab `reports`.
+
+> Sửa code sau khi đã deploy thì phải `push` rồi `deploy -i <deploymentId>` để cập nhật **cùng một URL**.
+
+**Đường tắt**: `git checkout origin/lab1-solution -- apps-script` rồi làm tiếp từ mục 6 (`push`).
+
+---
+
+## Bước 4 — Nạp dữ liệu, gọi API, QUERY (10')
+
+**Prompt**
+> Viết `scripts/labs/push-to-sheets.mjs`: đọc `SHEETS_API_URL`, `SHEETS_API_TOKEN` từ `.env.local` (dùng `process.loadEnvFile`), gửi `data/normalized/<bảng>.json` lên Web App bằng `action: 'import'` theo lô 200 dòng (lô đầu `replace: true`), theo thứ tự sets → cards → sellers → listings → price_references → pop_reports. Cuối cùng gọi `GET ?table=listings` và in số dòng. Chạy script.
 
 ```bash
 node scripts/labs/push-to-sheets.mjs
 ```
 
-**Kết quả mong đợi**: in `listings 535 dòng` … và `Kiểm tra GET ?table=listings → 535 dòng`. Mở Sheet: có 6 tab dữ liệu, tab `reports` hiện kết quả `QUERY()`.
+**Kết quả mong đợi**: `Kiểm tra GET ?table=listings → 535 dòng`.
 
-> Lần deploy đầu, nếu GET trả về trang HTML đăng nhập thay vì JSON: vào Apps Script → **Triển khai → Quản lý** và kiểm tra **Ai có quyền truy cập = Bất kỳ ai**.
-
-**Tự kiểm tra bằng trình duyệt**
+**Tự kiểm tra trên trình duyệt**
 - `<URL>?table=sellers` → 37 seller.
-- `<URL>?table=listings&grade=9` → các listing PSA 9.
+- `<URL>?table=listings&grade=9` → chỉ listing PSA 9.
+- Tab `reports` trong Sheet: hàm `QUERY()` hiển thị kết quả (cú pháp gần giống SQL nhưng **không JOIN được**).
 
-## Bước 6 — App đọc dữ liệu từ Sheets (10')
-
-**Prompt**
-> Tạo `lib/data-source.ts` với `getCatalog()` chọn nguồn theo env `DATA_SOURCE` (`json` mặc định, `sheets` gọi `SHEETS_API_URL?view=catalog`). Chuyển dữ liệu chuẩn hóa về đúng kiểu `PokemonCard` hiện có, tính lại `tier` và `diffPercent` thay vì đọc từ bảng. Cho `app/page.tsx` và `app/api/catalog/route.ts` dùng `getCatalog()`. Chạy `npx tsc --noEmit`.
-
-```bash
-# .env.local: DATA_SOURCE=sheets
-npm run dev
-```
-
-**Tự kiểm tra**
-- Trang chủ hiển thị đủ thẻ. `http://localhost:4173/api/catalog` trả 535 phần tử.
-- Sửa giá 1 dòng trong tab `listings` trên Sheet, reload trang (chế độ dev) và thấy giá đổi. Bạn vừa có một "CMS" bằng Google Sheets.
-- So sánh với `DATA_SOURCE=json`: 11 thẻ có giá PriceCharting khác nhau. Vì sao? (Xem `_conflicts.csv`.)
+**Đường tắt**: `git checkout origin/lab1-solution -- scripts/labs/push-to-sheets.mjs`
 
 ---
 
-## Câu hỏi ôn tập
-1. Google Sheets thiếu những gì so với một RDBMS? (khóa ngoại, transaction, kiểu dữ liệu chặt, JOIN, đồng thời ghi.) Code Apps Script đã bù những điểm nào? (`LockService`, kiểm tra trùng khóa, `catalogView_` thay cho JOIN.)
-2. Vì sao `order_items` lưu `unit_price_usd` dù đã có `listings.price_usd`?
-3. Hàm `QUERY()` của Sheets giống và khác SQL ở đâu?
-4. Token trong `doPost` bảo vệ được gì và **không** bảo vệ được gì? (URL `doGet` vẫn công khai.)
+## Tổng kết (thảo luận 3')
+1. Google Sheets thiếu gì so với RDBMS? (khóa ngoại, transaction, kiểu dữ liệu, JOIN.) Code Apps Script đã bù bằng gì? (`LockService`, tự kiểm tra trùng khóa, `?view=catalog` thay JOIN.)
+2. Token trong `doPost` bảo vệ được gì? `doGet` có lộ dữ liệu không?
+3. Vì sao `order_items` lưu lại giá lúc đặt dù `listings` đã có giá?
 
-## Bài tập mở rộng
-- Viết thêm Q11: tổng giá trị danh mục P/P theo tier, chỉ tính listing không nằm trong danh sách Q10.
-- Thêm API `?action=topDeals&tier=S` trong Apps Script.
+## Bài về nhà
+- Cho app đọc dữ liệu từ Sheet: tạo `lib/data-source.ts` chọn nguồn theo `DATA_SOURCE=json|sheets`, chuyển dữ liệu chuẩn hóa về kiểu `PokemonCard`, dùng trong `app/page.tsx`. (Lời giải: `git diff main origin/lab1-solution -- lib app`.)
 - Chuyển `schema.sql` sang PostgreSQL (Supabase/Neon free) và chạy lại `queries.sql`.
