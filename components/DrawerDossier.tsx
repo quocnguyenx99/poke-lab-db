@@ -240,24 +240,24 @@ export const DrawerDossier: React.FC<DrawerDossierProps> = ({
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', marginBottom: '10px' }}>
               <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '8px 10px' }}>
                 <div style={{ fontSize: '10px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Thẻ Raw Near Mint</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>${rawEst.toLocaleString()}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>${rawEst.toLocaleString('en-US')}</div>
                 <div style={{ fontSize: '10px', color: '#64748B' }}>~{rawVND}</div>
               </div>
               <div style={{ background: '#FFF', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '8px 10px' }}>
                 <div style={{ fontSize: '10px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Phí gửi Lab PSA</div>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#64748B', fontFamily: 'var(--font-mono)' }}>${psaFee}</div>
-                <div style={{ fontSize: '10px', color: '#64748B' }}>Tổng vốn: ${totalCost.toLocaleString()}</div>
+                <div style={{ fontSize: '10px', color: '#64748B' }}>Tổng vốn: ${totalCost.toLocaleString('en-US')}</div>
               </div>
               <div style={{ background: '#FFF1F2', border: '1px solid #FECDD3', borderRadius: '6px', padding: '8px 10px' }}>
                 <div style={{ fontSize: '10px', color: '#E11D48', fontWeight: 700, textTransform: 'uppercase' }}>PSA 10 Gem Mint</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#E11D48', fontFamily: 'var(--font-mono)' }}>${psa10Val.toLocaleString()}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#E11D48', fontFamily: 'var(--font-mono)' }}>${psa10Val.toLocaleString('en-US')}</div>
                 <div style={{ fontSize: '10px', color: '#059669', fontWeight: 700 }}>
-                  Lãi +{roiPSA10}% (+${profitPSA10.toLocaleString()})
+                  Lãi +{roiPSA10}% (+${profitPSA10.toLocaleString('en-US')})
                 </div>
               </div>
               <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '6px', padding: '8px 10px' }}>
                 <div style={{ fontSize: '10px', color: '#16A34A', fontWeight: 700, textTransform: 'uppercase' }}>Kịch bản phòng vệ (PSA 9)</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#16A34A', fontFamily: 'var(--font-mono)' }}>${floor9Val.toLocaleString()}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#16A34A', fontFamily: 'var(--font-mono)' }}>${floor9Val.toLocaleString('en-US')}</div>
                 <div style={{ fontSize: '10px', color: profitFloor >= 0 ? '#059669' : '#DC2626', fontWeight: 700 }}>
                   {profitFloor >= 0 ? `+$${profitFloor}` : `-$${Math.abs(profitFloor)}`}
                 </div>
