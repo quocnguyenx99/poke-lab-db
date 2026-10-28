@@ -20,3 +20,4 @@ firestore-debug.log
 # Lab 1 — dữ liệu sinh ra bởi scripts/labs/export-normalized.mjs
 data/normalized/
 *.db
+*.tsbuildinfo
