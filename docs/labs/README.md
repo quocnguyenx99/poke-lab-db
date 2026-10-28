@@ -55,6 +55,7 @@ Bị kẹt quá 3 phút thì dùng **Đường tắt** (lấy file từ lời gi
 
 | Triệu chứng | Cách xử lý |
 |---|---|
+| `git clone` báo `RPC failed`, `early EOF` (mạng yếu, repo ~70MB) | Clone nhẹ hơn: `git clone --depth 1 <url>`. Vẫn lỗi thì `git config --global http.version HTTP/1.1` rồi clone lại |
 | `npm run build`/`dev` báo `Invalid character` trong `node_modules/...d.ts` | Thư viện cài bị hỏng: xóa `node_modules` rồi chạy `npm ci` |
 | `Cannot find module 'node:sqlite'` | Node quá cũ, cài Node 22.13+ |
 | Port 4173 đang bận | `npx next dev -p 4180` |
