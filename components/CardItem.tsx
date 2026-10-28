@@ -154,7 +154,7 @@ export const CardItem: React.FC<CardItemProps> = ({
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
-          title={`Uy tín người bán: ${(card.sellerTransactions || 8000).toLocaleString()}+ đơn hàng hoàn thành • ${card.sellerFeedback || 99.8}% đánh giá tích cực`}
+          title={`Uy tín người bán: ${dec(card.sellerTransactions || 8000)}+ đơn hàng hoàn thành • ${card.sellerFeedback || 99.8}% đánh giá tích cực`}
         >
           <span>🛡️</span>
           <span>{card.sellerBadge || 'Top Seller >8.000 GD (99.8%)'}</span>
