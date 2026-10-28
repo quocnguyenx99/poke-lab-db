@@ -37,7 +37,7 @@ Windows 1-click: `CHAY_WINDOWS.bat`. Cần Node 22+. Biến môi trường mẫu
 Repo là bài thực hành Database với Agent cho học viên (xem `docs/labs/`):
 - **Lab 1** (`docs/labs/lab1-sql-sheets/`, `apps-script/`): chuẩn hóa catalog → ERD/SQL (`node:sqlite`), lưu Google Sheets, API bằng Apps Script deploy qua clasp.
 - **Lab 2** (`docs/labs/lab2-firebase-nosql/`): Firestore + Firebase Auth, shop demo (giỏ hàng, đặt hàng giả lập), deploy static export lên Firebase Hosting (gói Spark free).
-- Trên `main` các file lab (`lib/data-source.ts`, `apps-script/`, `scripts/labs/`, Firebase) **chưa tồn tại** — học viên tự tạo cùng Agent theo đề bài. Lời giải tham khảo ở branch `lab1-solution`.
+- Branch này chứa lời giải Lab 1: `lib/data-source.ts` (DATA_SOURCE=json|sheets), `apps-script/`, `scripts/labs/`, `docs/labs/lab1-sql-sheets/*.sql|*.md`.
 - Tài liệu lab viết cho học viên: mỗi bước là một prompt cho Agent + kết quả mong đợi + cách tự kiểm tra.
 
 Phiên bản cũ (HTML 1 file, `server.js`, script cào) ở branch/tag `legacy-snapshot`.
