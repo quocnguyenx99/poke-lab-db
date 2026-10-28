@@ -14,13 +14,13 @@
 
 ```bash
 git clone <repo> && cd pokemon-tcg
-git checkout -b lab1-<ten-ban> lab-start     # điểm xuất phát không có lời giải
+git checkout -b lab1-<ten-ban>              # làm bài trên branch riêng
 npm install
 npm run dev                                  # http://localhost:4173 — app đang đọc data/catalog/catalog.json
 ```
 
 > Mỗi bước dưới đây có: **Prompt** (dán cho Agent), **Kết quả mong đợi**, **Tự kiểm tra**. Đừng chấp nhận kết quả của Agent nếu chưa tự kiểm tra.
-> Lời giải tham khảo nằm ở branch `main`: `scripts/labs/`, `apps-script/`, `lib/data-source.ts`, và các file `.sql`/`.md` trong thư mục này.
+> Bị kẹt? Lời giải tham khảo ở branch `lab1-solution` (`git diff main lab1-solution` để xem toàn bộ thay đổi).
 
 ---
 

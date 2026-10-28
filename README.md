@@ -7,7 +7,7 @@ Repo này đồng thời là **bài thực hành Database với Agent**:
 | Lab | Nội dung | Tài liệu |
 |---|---|---|
 | Lab 1 | SQL · ERD · Use case · Google Sheets + Apps Script (clasp) | [docs/labs/lab1-sql-sheets](docs/labs/lab1-sql-sheets/README.md) |
-| Lab 2 | NoSQL · Firestore · Firebase Auth · Shop demo · Firebase Hosting | [docs/labs/lab2-firebase-nosql](docs/labs/lab2-firebase-nosql/README.md) |
+| Lab 2 | NoSQL · Firestore · Firebase Auth · Shop demo · Firebase Hosting | _(sắp cập nhật)_ |
 
 ## Chạy app
 
