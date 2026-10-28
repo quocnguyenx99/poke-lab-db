@@ -1,90 +1,47 @@
-# 🐻 Pokémon TCG — Snorlax & Munchlax PSA Market Atlas (Next.js App)
+# Snorlax × Munchlax — PSA Market Atlas
 
-> **Nền tảng phân tích đầu tư, theo dõi định giá thị trường và tỷ trọng dân số (Population Report) cho dòng thẻ bài Snorlax & Munchlax quy chuẩn PSA (PSA 7 – 10), phát triển hoàn toàn trên nền tảng Next.js App Router, React 19 và TypeScript.**
+Web app Next.js tra cứu **535 thẻ Pokémon Snorlax & Munchlax đã chấm điểm PSA**: giá Buy It Now trên eBay / Fanatics Collect, giá tham chiếu PriceCharting, xếp hạng tiềm năng S → F, PSA population, chế độ danh mục P/P < 400 triệu VNĐ.
 
----
+Repo này đồng thời là **bài thực hành Database với Agent**:
 
-## 🌟 ĐẶC ĐIỂM NỔI BẬT
+| Lab | Nội dung | Tài liệu |
+|---|---|---|
+| Lab 1 | SQL · ERD · Use case · Google Sheets + Apps Script (clasp) | [docs/labs/lab1-sql-sheets](docs/labs/lab1-sql-sheets/README.md) |
+| Lab 2 | NoSQL · Firestore · Firebase Auth · Shop demo · Firebase Hosting | [docs/labs/lab2-firebase-nosql](docs/labs/lab2-firebase-nosql/README.md) |
 
-- **Kiến trúc Next.js App Router hiện đại**:
-  - Tải trang tức thì với Server-side Generation (SSG) kết hợp React Client Hydration.
-  - Tự động tối ưu hóa tài nguyên, không độ trễ, cuộn và lọc mượt mà.
-  - Tích hợp API Routes nội bộ (`/api/catalog`, `/api/health`, `/api/fanatics-sync`).
-- **Quy chuẩn Duy nhất PSA (PSA ONLY)**:
-  - 198 phiên bản thẻ Snorlax & Munchlax được thẩm định chuẩn Professional Sports Authenticator (PSA 10 Gem Mint, PSA 9, PSA 8, PSA 7).
-- **Dual Marketplace Integration (Liên kết song song 2 sàn)**:
-  - Nút **`[⚡ Fanatics ↗]`** và **`[🛒 eBay ↗]`** trực tiếp trên từng thẻ và trong modal chi tiết.
-  - Khối đối chiếu giá trực tiếp Mua Ngay giữa kho Fanatics Collect Vault và sàn eBay Buy It Now.
-- **Bộ lọc & Sắp xếp đa tiêu chí (Nâng cấp PriceCharting)**:
-  - 📈 **Giá PriceCharting: Cao → Thấp** (Đắt nhất trước) & 📉 **Thấp → Cao** (Rẻ nhất trước).
-  - 💎 **Giá sàn Buy Now: Cao → Thấp** & 🏷️ **Thấp → Cao**.
-  - 🔥 **Săn Deal: Rẻ hơn PC nhiều nhất**.
-  - 🏆 **Điểm tiềm năng (S/A/B/C/D/F) & 👑 PSA 10 ít nhất (Pop hiếm)**.
-  - Chuyển đổi tiền tệ tức thì giữa **VNĐ (₫)** và **USD ($)**.
-- **Trải nghiệm 3D Slab & Phân tích chuyên sâu**:
-  - Hiệu ứng lắc 3D tương tác theo chuyển động chuột, phản quang Holo Glare.
-  - Chế độ tách phông AI (AI Cutout) và Zoom phóng to thẻ bài.
-  - Ma trận Grading Arbitrage và bảng phân bổ PSA Population Report (Grade 1 - 10).
+## Chạy app
 
----
+Cần Node.js 22+.
 
-## ⚡ HƯỚNG DẪN KHỞI CHẠY (QUICK START)
-
-### 1. Trên Windows (1-Click)
-Nhấp đúp chuột vào file:
-```cmd
-CHAY_WINDOWS.bat
-```
-Script sẽ tự động kiểm tra thư viện và khởi chạy máy chủ Next.js tại `http://localhost:4173`.
-
-### 2. Dùng lệnh Terminal / Console
 ```bash
-# Cài đặt thư viện (chỉ cần chạy lần đầu)
 npm install
-
-# Chạy chế độ phát triển (Dev Mode)
-npm run dev
-
-# Hoặc Build & Chạy bản Production tối ưu cao nhất
-npm run build
-npm start
+npm run dev          # http://localhost:4173
 ```
-- Truy cập Localhost: **`http://localhost:4173`**
-- Truy cập qua mạng nội bộ LAN: **`http://<IP_LAN>:4173`** (ví dụ: `http://192.168.245.101:4173`)
 
----
+Windows: nhấp đúp `CHAY_WINDOWS.bat`. macOS/Linux: `sh chay_mac_linux.sh`.
 
-## 🛠️ CẤU TRÚC THƯ MỤC DỰ ÁN
+Lệnh khác:
+
+```bash
+npm run build        # build production
+npm test             # unit test
+npx tsc --noEmit     # kiểm tra kiểu TypeScript
+```
+
+## Cấu trúc
 
 ```
-pokemon-tcg/
-├── app/                        # Next.js App Router
-│   ├── layout.tsx              # Root Layout, Google Fonts, Metadata
-│   ├── page.tsx                # Trang chủ nạp dữ liệu Server Component
-│   ├── globals.css             # Hệ thống Style Supabase White Theme
-│   └── api/                    # Next.js Serverless API Routes
-│       ├── catalog/route.ts    # API cung cấp 198 thẻ bài PSA
-│       └── health/route.ts     # API kiểm tra tình trạng máy chủ
-├── components/                 # Các linh kiện giao diện React
-│   ├── Dashboard.tsx           # Điều phối toàn bộ trạng thái Dashboard
-│   ├── Sidebar.tsx             # Thanh điều hướng phân hạng Tier S/A/B/C/D/F
-│   ├── Header.tsx              # Thanh tiêu đề Terminal & các nút xuất/nhập
-│   ├── Hero.tsx                # Khu vực giới thiệu & tiêu chuẩn đầu tư
-│   ├── StatGrid.tsx            # Thẻ thống kê danh mục, giá sàn, deal hời
-│   ├── Toolbar.tsx             # Thanh tìm kiếm, lọc character/grade, sắp xếp
-│   ├── CardDeck.tsx            # Bố cục lưới thẻ bài (Grid View)
-│   ├── CardItem.tsx            # Thẻ đơn lẻ với hiệu ứng 3D Holo
-│   ├── CardTable.tsx           # Bảng xếp hạng chi tiết (Table View)
-│   ├── DrawerDossier.tsx       # Hồ sơ phân tích đối chiếu 2 sàn & Arbitrage
-│   └── LightboxModal.tsx       # Cửa sổ phóng to 3D & tách phông AI
-├── data/                       # Kho dữ liệu thẻ bài phân cấp
-│   └── catalog/catalog.json    # Danh mục chuẩn 198 thẻ PSA
-├── types/                      # Định nghĩa kiểu dữ liệu TypeScript
-│   └── card.ts
-├── lib/                        # Thư viện tiện ích & hằng số tính toán
-│   ├── constants.ts
-│   └── utils.ts
-├── CHAY_WINDOWS.bat            # Script khởi chạy Windows 1-click
-├── chay_mac_linux.sh           # Script khởi chạy macOS/Linux
-└── package.json                # Cấu hình dependency Next.js & React 19
+app/                 Next.js App Router (page, layout, API routes)
+components/          Giao diện React (Dashboard giữ state, các component con)
+lib/                 Logic nghiệp vụ (utils.ts) và hằng số (constants.ts)
+types/card.ts        Kiểu PokemonCard — schema của catalog
+data/catalog/        catalog.json — nguồn dữ liệu gốc (535 thẻ)
+public/assets/cards/ Ảnh thẻ (.webp), tên file = id thẻ
+scripts/             Module eBay / graded research (có unit test)
+tests/               Unit test (node:test)
+docs/labs/           Đề bài và hướng dẫn 2 lab
 ```
+
+Phiên bản cũ (HTML 1 file, server Node, script cào dữ liệu) được giữ ở branch/tag `legacy-snapshot`.
+
+> Dữ liệu giá và ảnh lấy từ listing công khai, chỉ phục vụ mục đích học tập và nghiên cứu.

@@ -1,13 +1,11 @@
 {
   "name": "snorlax-munchlax-investment-research",
   "version": "1.0.0",
-  "description": "Snorlax and Munchlax Graded Card Investment Research Dashboard & Agent",
-  "main": "server.js",
+  "description": "Snorlax & Munchlax PSA Market Atlas — repo thực hành Database với Agent (SQL/Google Sheets & NoSQL/Firebase)",
   "scripts": {
     "dev": "next dev -p 4173 -H 0.0.0.0",
     "build": "next build",
     "start": "next start -p 4173 -H 0.0.0.0",
-    "legacy:start": "node server.js",
     "test": "node --test tests/ebay-market.test.js tests/graded-research.test.js"
   },
   "keywords": [

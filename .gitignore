@@ -1,9 +1,18 @@
 .env
+.env*.local
 node_modules/
-.npm-cache/
-research-cache/
 .next/
 out/
 .DS_Store
 *.log
-.playwright-mcp/
+
+# Lab 1 — clasp (mỗi người một scriptId riêng)
+apps-script/.clasp.json
+.clasprc.json
+
+# Lab 2 — Firebase
+secrets/
+.firebaserc
+.firebase/
+firebase-debug.log
+firestore-debug.log
