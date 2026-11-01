@@ -9,21 +9,60 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == uid;
     }
 
+    function card(listingId) {
+      return get(/databases/$(database)/documents/cards/$(listingId)).data;
+    }
+
     // Catalog: ai cũng đọc được, không ai ghi từ trình duyệt
     match /cards/{cardId} {
       allow read: if true;
       allow write: if false;
     }
 
-    // Hồ sơ và mọi subcollection (favorites, cart…): chỉ chủ tài khoản
     match /users/{uid} {
-      allow read, write: if isOwner(uid);
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'createdAt']);
+      allow delete: if false;
 
-      match /{subcollection=**} {
-        allow read, write: if isOwner(uid);
+      // Yêu thích: chỉ được thích thẻ có thật trong catalog
+      match /favorites/{listingId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['addedAt'])
+          && exists(/databases/$(database)/documents/cards/$(listingId));
+      }
+
+      // Giỏ hàng: giá phải đúng bằng giá niêm yết trong cards/{listingId} (không sửa giá được từ client)
+      match /cart/{listingId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['name', 'grade', 'priceUSD', 'image', 'addedAt'])
+          && request.resource.data.priceUSD == card(listingId).listingPriceUSD;
       }
     }
 
-    // Mọi đường dẫn khác (kể cả orders, sẽ mở ở bước 2.5): mặc định bị chặn
+    // Đơn hàng: chỉ chủ đơn đọc; chỉ tạo mới, không sửa, không xóa
+    match /orders/{orderId} {
+      // Rules KHÔNG phải bộ lọc: query phải có where('userId', '==', uid) thì mới được chấp nhận
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['userId', 'items', 'totalUSD', 'status', 'createdAt'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 20 // khớp MAX_ORDER_ITEMS trong lib/shop.ts
+        && request.resource.data.totalUSD is number
+        && request.resource.data.totalUSD > 0
+        && request.resource.data.createdAt == request.time; // bắt buộc dùng serverTimestamp()
+      // Lỗ hổng còn lại: Rules không lặp được qua items[] để so từng giá với cards,
+      // nên totalUSD vẫn có thể bị sửa. Shop thật phải tính tiền ở server (Cloud Functions — cần gói Blaze).
+
+      allow update, delete: if false;
+    }
+
+    // Mọi đường dẫn khác: mặc định bị chặn
   }
 }
