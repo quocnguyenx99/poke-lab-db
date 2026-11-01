@@ -31,7 +31,7 @@ Trước khi bắt đầu, đọc [01-phan-tich-usecase-erd.md](01-phan-tich-use
 
 - [x] 2.1 Tạo database (production mode, `asia-southeast1`)
 - [x] 2.2 Service account + script seed 535 thẻ bằng Admin SDK
-- [ ] 2.3 Tạo `users/{uid}` khi đăng ký; yêu thích đồng bộ cloud
+- [x] 2.3 Tạo `users/{uid}` khi đăng ký; yêu thích đồng bộ cloud
 - [ ] 2.4 Giỏ hàng, đặt hàng (`writeBatch`), lịch sử đơn
 - [ ] 2.5 Security Rules + thử bằng Rules Playground
 

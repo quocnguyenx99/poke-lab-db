@@ -13,6 +13,8 @@ import { DrawerDossier } from './DrawerDossier';
 import { LightboxModal } from './LightboxModal';
 import { getScore, gradeToTier, getBest, getDiff } from '@/lib/utils';
 import { TIER_META } from '@/lib/constants';
+import { useAuth } from '@/components/AuthProvider';
+import { subscribeFavorites, setFavorite } from '@/lib/user-data';
 
 interface DashboardProps {
   initialCatalog: PokemonCard[];
@@ -36,11 +38,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialCatalog }) => {
   const [selectedDetailCard, setSelectedDetailCard] = useState<PokemonCard | null>(null);
   const [selectedLightboxCard, setSelectedLightboxCard] = useState<PokemonCard | null>(null);
 
-  // Load favorites and currency from localStorage
+  const { user, loading: authLoading } = useAuth();
+
+  // Load currency from localStorage
   useEffect(() => {
     try {
-      const savedFavs = localStorage.getItem('snoratlas-favorites-next');
-      if (savedFavs) setFavorites(JSON.parse(savedFavs));
       const savedCur = localStorage.getItem('snoratlas-currency-next') as Currency;
       if (savedCur) setCurrency(savedCur);
     } catch {}
@@ -52,7 +54,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialCatalog }) => {
       .catch(() => setServerOnline(false));
   }, []);
 
+  // Đã đăng nhập: favorites lấy realtime từ Firestore. Chưa đăng nhập: dùng localStorage như cũ.
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      try {
+        const savedFavs = localStorage.getItem('snoratlas-favorites-next');
+        setFavorites(savedFavs ? JSON.parse(savedFavs) : {});
+      } catch {
+        setFavorites({});
+      }
+      return;
+    }
+    return subscribeFavorites(user.uid, setFavorites, (err) => console.error('Không đọc được favorites:', err));
+  }, [user, authLoading]);
+
   const handleToggleFavorite = (id: string) => {
+    if (user) {
+      // Không setFavorites ở đây: onSnapshot báo thay đổi ngay lập tức (latency compensation), kể cả trước khi server xác nhận
+      setFavorite(user.uid, id, !favorites[id]).catch((err) => {
+        console.error(err);
+        alert('Không lưu được yêu thích lên cloud. Thử lại sau.');
+      });
+      return;
+    }
     setFavorites((prev) => {
       const next = { ...prev, [id]: !prev[id] };
       try {

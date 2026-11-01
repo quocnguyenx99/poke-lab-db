@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Next.js chỉ thay biến NEXT_PUBLIC_* vào code trình duyệt khi viết đúng nguyên văn
 // process.env.NEXT_PUBLIC_..., không đọc động kiểu process.env[name].
@@ -20,6 +21,9 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
 export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+// Client SDK: mọi đọc/ghi từ trình duyệt đều bị Security Rules (firestore.rules) kiểm tra
+export const db = getFirestore(app);
 
 export const googleProvider = new GoogleAuthProvider();
 // Luôn hiện màn hình chọn tài khoản, tiện khi thử với nhiều tài khoản Google

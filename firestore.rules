@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// Ma trận phân quyền: docs/firebase-guide/01-phan-tich-usecase-erd.md §7
+// Admin SDK (scripts/labs/seed-firestore.mjs) bỏ qua toàn bộ file này.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // Catalog: ai cũng đọc được, không ai ghi từ trình duyệt
+    match /cards/{cardId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Hồ sơ và mọi subcollection (favorites, cart…): chỉ chủ tài khoản
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /{subcollection=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Mọi đường dẫn khác (kể cả orders, sẽ mở ở bước 2.5): mặc định bị chặn
+  }
+}

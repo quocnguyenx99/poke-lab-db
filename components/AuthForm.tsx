@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import { getAuthErrorMessage } from '@/lib/auth-errors';
+import { saveDisplayName } from '@/lib/user-data';
 import { useAuth } from '@/components/AuthProvider';
 
 interface AuthFormProps {
@@ -51,7 +52,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     run(async () => {
       if (isRegister) {
         const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        if (displayName.trim()) await updateProfile(cred.user, { displayName: displayName.trim() });
+        const name = displayName.trim();
+        if (name) {
+          await updateProfile(cred.user, { displayName: name }); // lưu trong Firebase Auth
+          await saveDisplayName(cred.user.uid, name); // lưu vào hồ sơ users/{uid} trên Firestore
+        }
       } else {
         await signInWithEmailAndPassword(auth, email.trim(), password);
       }

@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { ensureUserProfile } from '@/lib/user-data';
 
 interface AuthContextValue {
   user: User | null;
@@ -25,6 +26,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+      if (firebaseUser) {
+        // Không chặn giao diện chờ Firestore; lỗi (thường do Rules) chỉ ghi ra console
+        ensureUserProfile(firebaseUser).catch((err) => console.error('Không tạo được users/{uid}:', err));
+      }
     });
     return unsubscribe;
   }, []);
