@@ -22,6 +22,8 @@ interface CardItemProps {
   onOpenLightbox: (card: PokemonCard) => void;
   onToggleFavorite: (id: string) => void;
   isFavorite: boolean;
+  onAddToCart: (id: string) => void;
+  inCart: boolean;
 }
 
 export const CardItem: React.FC<CardItemProps> = ({
@@ -32,6 +34,8 @@ export const CardItem: React.FC<CardItemProps> = ({
   onOpenLightbox,
   onToggleFavorite,
   isFavorite,
+  onAddToCart,
+  inCart,
 }) => {
   const [imgError, setImgError] = useState(false);
   const score = getScore(card);
@@ -234,6 +238,14 @@ export const CardItem: React.FC<CardItemProps> = ({
 
         <div className="actionline">
           <button onClick={() => onOpenDetail(card)}>Chi tiết</button>
+          <button
+            className={`go-cart${inCart ? ' in-cart' : ''}`}
+            onClick={() => onAddToCart(card.id)}
+            disabled={inCart}
+            title={inCart ? 'Thẻ đã có trong giỏ hàng' : 'Thêm vào giỏ hàng (đặt hàng giả lập)'}
+          >
+            {inCart ? '✓ Trong giỏ' : '＋ Giỏ'}
+          </button>
           <a
             className="go-fanatics"
             target="_blank"

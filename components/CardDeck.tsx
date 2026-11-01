@@ -15,6 +15,8 @@ interface CardDeckProps {
   onOpenLightbox: (card: PokemonCard) => void;
   onToggleFavorite: (id: string) => void;
   favorites: Record<string, boolean>;
+  onAddToCart: (id: string) => void;
+  cartIds: Record<string, boolean>;
 }
 
 export const CardDeck: React.FC<CardDeckProps> = ({
@@ -26,6 +28,8 @@ export const CardDeck: React.FC<CardDeckProps> = ({
   onOpenLightbox,
   onToggleFavorite,
   favorites,
+  onAddToCart,
+  cartIds,
 }) => {
   if (!cards.length) {
     return (
@@ -52,6 +56,8 @@ export const CardDeck: React.FC<CardDeckProps> = ({
             onOpenLightbox={onOpenLightbox}
             onToggleFavorite={onToggleFavorite}
             isFavorite={Boolean(favorites[c.id])}
+            onAddToCart={onAddToCart}
+            inCart={Boolean(cartIds[c.id])}
           />
         ))}
       </div>
@@ -182,6 +188,8 @@ export const CardDeck: React.FC<CardDeckProps> = ({
                   onOpenLightbox={onOpenLightbox}
                   onToggleFavorite={onToggleFavorite}
                   isFavorite={Boolean(favorites[c.id])}
+                  onAddToCart={onAddToCart}
+                  inCart={Boolean(cartIds[c.id])}
                 />
               ))}
             </div>

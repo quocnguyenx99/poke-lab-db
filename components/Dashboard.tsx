@@ -15,6 +15,9 @@ import { getScore, gradeToTier, getBest, getDiff } from '@/lib/utils';
 import { TIER_META } from '@/lib/constants';
 import { useAuth } from '@/components/AuthProvider';
 import { subscribeFavorites, setFavorite } from '@/lib/user-data';
+import { useCart } from '@/components/CartProvider';
+import { addToCart } from '@/lib/shop';
+import { useRouter } from 'next/navigation';
 
 interface DashboardProps {
   initialCatalog: PokemonCard[];
@@ -39,6 +42,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialCatalog }) => {
   const [selectedLightboxCard, setSelectedLightboxCard] = useState<PokemonCard | null>(null);
 
   const { user, loading: authLoading } = useAuth();
+  const { ids: cartIds } = useCart();
+  const router = useRouter();
 
   // Load currency from localStorage
   useEffect(() => {
@@ -85,6 +90,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialCatalog }) => {
       } catch {}
       return next;
     });
+  };
+
+  const handleAddToCart = (id: string) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    addToCart(user.uid, id).catch((err) => alert(err instanceof Error ? err.message : 'Không thêm được vào giỏ.'));
   };
 
   const handleCurrencyChange = (c: Currency) => {
@@ -269,6 +282,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialCatalog }) => {
               onOpenLightbox={setSelectedLightboxCard}
               onToggleFavorite={handleToggleFavorite}
               favorites={favorites}
+              onAddToCart={handleAddToCart}
+              cartIds={cartIds}
             />
           </div>
         ) : (
