@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Static export: route được chụp thành file lúc build
+export const dynamic = 'force-static';
+
 export async function GET() {
   return NextResponse.json({
     ok: true,

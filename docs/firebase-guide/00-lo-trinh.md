@@ -37,9 +37,9 @@ Trước khi bắt đầu, đọc [01-phan-tich-usecase-erd.md](01-phan-tich-use
 
 ## Giai đoạn 3 — Hosting (domain miễn phí)
 
-- [ ] 3.1 Bật static export cho Next.js, build ra `out/`
-- [ ] 3.2 `firebase.json`, `.firebaserc`
-- [ ] 3.3 Deploy, thêm domain vào Authorized domains, thử trên `https://<project-id>.web.app`
+- [x] 3.1 Bật static export cho Next.js, build ra `out/`
+- [x] 3.2 `firebase.json`, `.firebaserc`
+- [x] 3.3 Deploy, thêm domain vào Authorized domains, thử trên `https://<project-id>.web.app`
 
 ## Giai đoạn 4 — Ảnh trên Cloud Storage (tùy chọn, cần Blaze)
 

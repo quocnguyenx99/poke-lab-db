@@ -9,7 +9,8 @@ Dashboard nghiên cứu đầu tư thẻ Pokémon **Snorlax & Munchlax đã ch�
 ```bash
 npm install
 npm run dev        # Next.js dev, http://localhost:4173 (bind 0.0.0.0 → truy cập được qua LAN)
-npm run build && npm start   # production
+npm run build      # static export → out/ (next start không dùng được với output: export)
+npx firebase-tools@15.34.1 deploy --only hosting,firestore:rules   # https://pokelab-e965e.web.app
 npm test           # node:test — tests/ebay-market.test.js, tests/graded-research.test.js
 npx tsc --noEmit   # typecheck
 ```
