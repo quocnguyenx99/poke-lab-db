@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { UserMenu } from '@/components/UserMenu';
 
 interface HeaderProps {
   onExport: () => void;
@@ -55,6 +56,8 @@ export const Header: React.FC<HeaderProps> = ({ onExport, onImport, onAddCard })
         <button className="small-button primary" onClick={onAddCard}>
           ＋ Thêm thẻ
         </button>
+        <span className="topline-sep" />
+        <UserMenu />
       </div>
     </div>
   );
